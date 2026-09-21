@@ -10,11 +10,77 @@ app.get('/',(req,res) => {
 //Obtener todos los productos
 app.get('/productos', async (req, res) => {
     try{
-        const resultado = await pool.query ('SELECT * FROM productos');
+        const { nombre, categoria} = req.query;
+        let resultado;
+
+        //Busca por nombre y categoria
+        if(nombre && categoria){
+            resultado = await pool.query(
+                `SELECT p.id, 
+                p.nombre,
+                p.precio,
+                p.cantidad,
+                p.categoria_id,
+                c.nombre AS nombre_categoria
+                FROM productos AS p
+                INNER JOIN categorias AS c
+                ON p.categoria_id = c.id
+                WHERE p.nombre ILIKE $1
+                AND p.categoria_id = $2`,
+                [`%${nombre}%`, categoria]
+            );
+        //Busca por nombre
+        }else if (nombre){
+            resultado = await pool.query(
+                `SELECT p.id,
+                p.nombre,
+                p.precio,
+                p.cantidad,
+                p.categoria_id,
+                c.nombre AS nombre_categoria
+                FROM productos AS p
+                INNER JOIN categorias As c
+                ON p.categoria_id= c.id
+                WHERE p.nombre ILIKE $1`,
+                [`%${nombre}%`]
+            );
+        
+        //Busca por categoria
+        }else if (categoria){
+            resultado = await pool.query(
+                `SELECT p.id,
+                p.nombre,
+                p.precio,
+                p.cantidad,
+                p.categoria_id,
+                c.nombre AS nombre_categoria
+                FROM productos AS p
+                INNER JOIN categorias As c
+                ON p.categoria_id= c.id
+                WHERE p.categoria_id= $1`,
+                [categoria]
+            );
+       
+        //Sin filtros
+        } else {
+            resultado = await pool.query(
+                `SELECT p.id,
+                p.nombre,
+                p.precio,
+                p.cantidad,
+                p.categoria_id,
+                c.nombre AS nombre_categoria
+                FROM productos AS p
+                INNER JOIN categorias As c
+                ON p.categoria_id= c.id`
+            );
+        }
 
         res.json(resultado.rows);
+
     }catch (error){
         console.error('Error al obtener productos:', error);
+        
         res.status(500).json({
             error:'Error al obtener productos'
         }); 
@@ -43,6 +109,7 @@ app.get('/productos/:id', async (req,res)=> {
         });
     }
 });
+
 
 //Crear un producto
 app.post('/productos', async (req, res) => {
