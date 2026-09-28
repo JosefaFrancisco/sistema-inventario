@@ -1,7 +1,9 @@
 const express = require('express');//Quiero utilizar express que instalamos antes
+const cors=require("cors")
 const pool= require('./db');
 const app = express();//Aqui creamos la aplicacion usando express
 
+app.use(cors())
 app.use(express.json());
     
 app.get('/',(req,res) => {
