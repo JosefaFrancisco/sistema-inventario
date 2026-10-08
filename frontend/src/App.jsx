@@ -1,4 +1,7 @@
 import {useEffect, useState} from "react"  
+import Sidebar from "./components/Sidebar"
+import Header from "./components/Header"
+import "./App.css"
 function  App (){
   const [productos, setProductos]=useState([])
 
@@ -15,10 +18,12 @@ function  App (){
   }, [])
   return(
     <>
-     <h1>Sistema de inventario</h1>
-     <h2>Productos</h2>
-     <table>
-      <thead>
+      <Sidebar/>
+      <main className= "main-content">
+        <Header/>
+        <h2>Productos</h2>
+        <table>
+          <thead>
         <tr>
           <th>ID</th>
           <th>Producto</th>
@@ -37,7 +42,8 @@ function  App (){
         </tr>
       ))}
      </tbody>
-    </table>
+        </table>
+      </main>
    
     </>
 )
